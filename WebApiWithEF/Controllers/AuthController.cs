@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Authorization.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 using WebApiWithEF.Dtos;
 
 namespace WebApiWithEF.Controllers
@@ -20,21 +22,22 @@ namespace WebApiWithEF.Controllers
             this.configuration = configuration;
             this.repository = repository;
         }
+
         [HttpPost("register")]
-        public async Task<ActionResult> Register(RegisterUserDto userDto)
+        public async Task<ActionResult> Register(RegisterUserDto request)
         {
             var user = new User
             {
                 Id = Guid.NewGuid(),
-                Name = userDto.Name,
-                Login = userDto.Login,
+                Name = request.Name,
+                Login = request.Login,
                 CreatedOn = DateTime.Now
             };
 
             if (repository.GetUser(user.Login) != null)
                 return BadRequest("User with this login is already exist");
 
-            CreatePasswordHash(userDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
@@ -44,16 +47,17 @@ namespace WebApiWithEF.Controllers
 
             return Ok(user);
         }
+
         [HttpPost("login")]
-        public async Task<ActionResult> Login(string login, string password)
+        public async Task<ActionResult> Login(LoginDto request)
         {
-            var user = repository.GetUser(login);
+            var user = repository.GetUser(request.Login);
             if (user == null)
                 return NotFound();
 
-            if (!CheckPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            if (!CheckPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 return BadRequest("WrongPassword");
-            
+
             var token = CreateToken(user);
             return Ok(token);
         }
@@ -62,16 +66,17 @@ namespace WebApiWithEF.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Login),
+                //new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 configuration.GetSection("AppSettings:TokenKey").Value));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
             var jwt = new JwtSecurityToken(
-                claims:claims,
-                expires: DateTime.UtcNow.AddHours(10),
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials);
 
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
@@ -82,7 +87,7 @@ namespace WebApiWithEF.Controllers
         {
             using (var hmac = new HMACSHA512())
             {
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 passwordSalt = hmac.Key;
             }
         }
@@ -90,7 +95,7 @@ namespace WebApiWithEF.Controllers
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
-                var hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
                 return hash.SequenceEqual(passwordHash);
             }
         }

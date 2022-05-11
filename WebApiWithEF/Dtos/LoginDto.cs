@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApiWithEF.Dtos
+namespace Authorization.Models
 {
-    public class RegisterUserDto
+    public class LoginDto
     {
-        [Required]
-        public string Name { get; set; }
         [Required]
         [EmailAddress]
         public string Login { get; set; }

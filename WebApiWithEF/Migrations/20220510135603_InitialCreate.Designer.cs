@@ -9,11 +9,11 @@ using WebApiWithEF.Repository;
 
 #nullable disable
 
-namespace WebApiWithEF.Migrations
+namespace Authorization.Migrations
 {
     [DbContext(typeof(DbUserRepository))]
-    [Migration("20220509135001_ChangeUserEntity")]
-    partial class ChangeUserEntity
+    [Migration("20220510135603_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

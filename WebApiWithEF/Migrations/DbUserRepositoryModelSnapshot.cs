@@ -8,7 +8,7 @@ using WebApiWithEF.Repository;
 
 #nullable disable
 
-namespace WebApiWithEF.Migrations
+namespace Authorization.Migrations
 {
     [DbContext(typeof(DbUserRepository))]
     partial class DbUserRepositoryModelSnapshot : ModelSnapshot

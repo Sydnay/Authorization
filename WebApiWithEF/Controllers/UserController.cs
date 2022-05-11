@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApiWithEF.Dtos;
 
@@ -6,6 +7,7 @@ namespace WebApiWithEF.Controllers
 {
     [ApiController]
     [Route("api/users")]
+    [Authorize]
     public class UserController : Controller
     {
         DbUserRepository repository;
@@ -14,6 +16,21 @@ namespace WebApiWithEF.Controllers
             this.repository = repository;
         }
 
+        [HttpGet]
+        public ActionResult GetAllAuthorizedUsers()
+        {
+            return Ok(repository.GetAllUsers());
+        }
+        [HttpGet("user")]
+        public ActionResult GetAuthorizedUser(string login)
+        {
+            var user = repository.GetUser(login);
+
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
         [HttpDelete]
         public ActionResult DeleteUser(string login)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApiWithEF.Repository
 {
@@ -18,6 +19,11 @@ namespace WebApiWithEF.Repository
         public void DeleteUser(string login)
         {
             Users.Remove(GetUser(login));
+        }
+
+        internal List<User> GetAllUsers()
+        {
+            return Users.ToList();
         }
     }
 }
