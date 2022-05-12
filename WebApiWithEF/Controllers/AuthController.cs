@@ -1,4 +1,5 @@
 ﻿using Authorization.Models;
+using Authorization.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -11,13 +12,12 @@ using WebApiWithEF.Dtos;
 namespace WebApiWithEF.Controllers
 {
     [ApiController]
-    [Route("auth")]
+    [Route("api/[controller]")]
     public class AuthController : Controller
     {
-        DbUserRepository repository;
-        //MemoryUserRepository repository;
-        IConfiguration configuration;
-        public AuthController(IConfiguration configuration, DbUserRepository repository)
+        private readonly LikedSongsContext repository;
+        private readonly IConfiguration configuration;
+        public AuthController(IConfiguration configuration, LikedSongsContext repository)
         {
             this.configuration = configuration;
             this.repository = repository;
@@ -26,21 +26,29 @@ namespace WebApiWithEF.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterUserDto request)
         {
-            var user = new User
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Login = request.Login,
-                CreatedOn = DateTime.Now
-            };
-
-            if (repository.GetUser(user.Login) != null)
+            if (repository.GetUser(request.Email) != null)
                 return BadRequest("User with this login is already exist");
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = request.Email,
+                CreatedOn = DateTime.Now,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
+            };
 
-            user.PasswordHash = passwordHash;
-            user.PasswordSalt = passwordSalt;
+            var userProfile = new UserProfile
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Gender = request.Gender,
+                UserId = user.Id,
+                User = user,
+                CreatedOn = DateTime.Now
+            }
+
 
             repository.AddUser(user);
             repository.SaveChanges();
@@ -51,7 +59,7 @@ namespace WebApiWithEF.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginDto request)
         {
-            var user = repository.GetUser(request.Login);
+            var user = repository.GetUser(request.Email);
             if (user == null)
                 return NotFound();
 
@@ -65,7 +73,7 @@ namespace WebApiWithEF.Controllers
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Login),
+                new Claim(ClaimTypes.NameIdentifier, user.Email),
                 //new Claim(ClaimTypes.Role, user.Role.ToString()),
             };
 

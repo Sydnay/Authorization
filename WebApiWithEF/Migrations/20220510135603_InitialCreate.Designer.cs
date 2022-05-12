@@ -11,7 +11,7 @@ using WebApiWithEF.Repository;
 
 namespace Authorization.Migrations
 {
-    [DbContext(typeof(DbUserRepository))]
+    [DbContext(typeof(LikedSongsContext))]
     [Migration("20220510135603_InitialCreate")]
     partial class InitialCreate
     {

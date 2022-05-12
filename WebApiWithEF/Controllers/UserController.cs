@@ -10,8 +10,8 @@ namespace WebApiWithEF.Controllers
     [Authorize]
     public class UserController : Controller
     {
-        DbUserRepository repository;
-        public UserController(DbUserRepository repository)
+        LikedSongsContext repository;
+        public UserController(LikedSongsContext repository)
         {
             this.repository = repository;
         }

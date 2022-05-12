@@ -10,7 +10,7 @@ using WebApiWithEF.Repository;
 
 namespace Authorization.Migrations
 {
-    [DbContext(typeof(DbUserRepository))]
+    [DbContext(typeof(LikedSongsContext))]
     partial class DbUserRepositoryModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Authorization.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebApiWithEF.Dtos
 {
@@ -7,10 +8,16 @@ namespace WebApiWithEF.Dtos
         [Required]
         public string Name { get; set; }
         [Required]
+        [Range(0,1)]
+        public Gender Gender { get; set; }
+        [Required]
         [EmailAddress]
-        public string Login { get; set; }
+        public string Email { get; set; }
         [Required]
         [MinLength(6)]
         public string Password { get; set; }
+        [Required]
+        [Compare("Password")]
+        public string ConfirmPassword { get; set; }
     }
 }
