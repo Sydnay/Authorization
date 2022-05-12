@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiWithEF.Repository;
 
@@ -11,9 +12,10 @@ using WebApiWithEF.Repository;
 namespace Authorization.Migrations
 {
     [DbContext(typeof(PlaylistContext))]
-    partial class DbUserRepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220512124130_AddModels")]
+    partial class AddModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +48,7 @@ namespace Authorization.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("LikedList");
+                    b.ToTable("Playlist");
                 });
 
             modelBuilder.Entity("Authorization.Entities.Role", b =>

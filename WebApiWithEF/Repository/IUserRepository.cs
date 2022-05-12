@@ -1,4 +1,4 @@
-﻿namespace WebApiWithEF.Repository
+﻿namespace Authorization.Entities
 {
     public interface IUserRepository
     {

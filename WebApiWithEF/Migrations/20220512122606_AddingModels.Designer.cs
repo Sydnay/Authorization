@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApiWithEF.Repository;
 
@@ -11,9 +12,10 @@ using WebApiWithEF.Repository;
 namespace Authorization.Migrations
 {
     [DbContext(typeof(PlaylistContext))]
-    partial class DbUserRepositoryModelSnapshot : ModelSnapshot
+    [Migration("20220512122606_AddingModels")]
+    partial class AddingModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +24,7 @@ namespace Authorization.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Authorization.Entities.Playlist", b =>
+            modelBuilder.Entity("Authorization.Entities.LikedList", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,7 +46,8 @@ namespace Authorization.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("OwnerId")
+                        .IsUnique();
 
                     b.ToTable("LikedList");
                 });
@@ -131,7 +134,7 @@ namespace Authorization.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Birthday")
+                    b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Gender")
@@ -152,26 +155,26 @@ namespace Authorization.Migrations
                     b.ToTable("Profiles");
                 });
 
-            modelBuilder.Entity("PlaylistSong", b =>
+            modelBuilder.Entity("LikedListSong", b =>
                 {
-                    b.Property<Guid>("PlaylistsId")
+                    b.Property<Guid>("LikedListsId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SongsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("PlaylistsId", "SongsId");
+                    b.HasKey("LikedListsId", "SongsId");
 
                     b.HasIndex("SongsId");
 
-                    b.ToTable("PlaylistSong");
+                    b.ToTable("LikedListSong");
                 });
 
-            modelBuilder.Entity("Authorization.Entities.Playlist", b =>
+            modelBuilder.Entity("Authorization.Entities.LikedList", b =>
                 {
                     b.HasOne("Authorization.Entities.UserProfile", "Owner")
-                        .WithMany("Playlists")
-                        .HasForeignKey("OwnerId")
+                        .WithOne("LikedList")
+                        .HasForeignKey("Authorization.Entities.LikedList", "OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -189,11 +192,11 @@ namespace Authorization.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PlaylistSong", b =>
+            modelBuilder.Entity("LikedListSong", b =>
                 {
-                    b.HasOne("Authorization.Entities.Playlist", null)
+                    b.HasOne("Authorization.Entities.LikedList", null)
                         .WithMany()
-                        .HasForeignKey("PlaylistsId")
+                        .HasForeignKey("LikedListsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -212,7 +215,8 @@ namespace Authorization.Migrations
 
             modelBuilder.Entity("Authorization.Entities.UserProfile", b =>
                 {
-                    b.Navigation("Playlists");
+                    b.Navigation("LikedList")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
