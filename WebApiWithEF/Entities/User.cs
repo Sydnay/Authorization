@@ -12,9 +12,4 @@
         public byte[] PasswordSalt { get; set; }
         public DateTime CreatedOn { get; set; }
     }
-    public enum Role
-    {
-        DefaultUser,
-        Admin
-    }
 }

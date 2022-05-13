@@ -22,7 +22,7 @@ namespace Authorization.Controllers
         {
             ClaimsPrincipal currentUser = User;
             var email = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var profile = repository.Profiles.FirstOrDefault(user => user.User.Email.Equals(email));
+            var profile = await repository.Profiles.FirstOrDefaultAsync(user => user.User.Email.Equals(email));
 
             return profile.ProfileInfo();
         }
