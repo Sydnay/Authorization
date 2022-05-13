@@ -10,8 +10,13 @@ namespace WebApiWithEF.Controllers
     [Authorize]
     public class UserController : Controller
     {
+<<<<<<< HEAD
         PlaylistContext repository;
         public UserController(PlaylistContext repository)
+=======
+        LikedSongsContext repository;
+        public UserController(LikedSongsContext repository)
+>>>>>>> 5d6d770f0844806175d90ef977ac5e4809a94fd7
         {
             this.repository = repository;
         }

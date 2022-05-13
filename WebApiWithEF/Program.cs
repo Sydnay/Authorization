@@ -10,7 +10,11 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+<<<<<<< HEAD
 builder.Services.AddDbContext<PlaylistContext>(options =>
+=======
+builder.Services.AddDbContext<LikedSongsContext>(options =>
+>>>>>>> 5d6d770f0844806175d90ef977ac5e4809a94fd7
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionToSQL"));
 });

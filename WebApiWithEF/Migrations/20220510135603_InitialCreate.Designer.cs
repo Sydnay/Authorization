@@ -11,7 +11,11 @@ using WebApiWithEF.Repository;
 
 namespace Authorization.Migrations
 {
+<<<<<<< HEAD
     [DbContext(typeof(PlaylistContext))]
+=======
+    [DbContext(typeof(LikedSongsContext))]
+>>>>>>> 5d6d770f0844806175d90ef977ac5e4809a94fd7
     [Migration("20220510135603_InitialCreate")]
     partial class InitialCreate
     {
