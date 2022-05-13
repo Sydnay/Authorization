@@ -28,7 +28,7 @@ namespace Authorization.Controllers
         }
         [HttpPut("update")]
         [Authorize]
-        public async Task<ActionResult> UpdateProfile(Guid id, UpdateProfileDto profileDto)
+        public async Task<ActionResult> UpdateProfile(UpdateProfileDto profileDto)
         {
             ClaimsPrincipal currentUser = User;
             var email = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
