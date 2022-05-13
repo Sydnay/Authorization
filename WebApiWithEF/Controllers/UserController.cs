@@ -6,7 +6,7 @@ using WebApiWithEF.Dtos;
 namespace WebApiWithEF.Controllers
 {
     [ApiController]
-    [Route("api/users")]
+    [Route("api/[controller]")]
     [Authorize]
     public class UserController : Controller
     {

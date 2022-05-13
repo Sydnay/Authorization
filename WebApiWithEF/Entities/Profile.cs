@@ -1,6 +1,6 @@
 ﻿namespace Authorization.Entities
 {
-    public class UserProfile
+    public class Profile
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

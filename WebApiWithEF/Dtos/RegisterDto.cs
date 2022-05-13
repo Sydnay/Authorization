@@ -3,12 +3,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebApiWithEF.Dtos
 {
-    public class RegisterUserDto
+    public class RegisterDto
     {
         [Required]
         public string Name { get; set; }
+        public DateTime Birthday { get; set; }
         [Required]
-        [Range(0,1)]
+        [Range(0, 1)]
         public Gender Gender { get; set; }
         [Required]
         [EmailAddress]

@@ -46,28 +46,7 @@ namespace Authorization.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("LikedList");
-                });
-
-            modelBuilder.Entity("Authorization.Entities.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
+                    b.ToTable("Playlists");
                 });
 
             modelBuilder.Entity("Authorization.Entities.Song", b =>
@@ -116,9 +95,6 @@ namespace Authorization.Migrations
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

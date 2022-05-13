@@ -12,9 +12,15 @@ namespace Authorization.Migrations
             migrationBuilder.DropTable(
                 name: "LikedListSong");
 
-            migrationBuilder.DropIndex(
-                name: "IX_LikedList_OwnerId",
-                table: "LikedList");
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "LikedList");
+
+            migrationBuilder.DropColumn(
+                name: "RoleId",
+                table: "Users");
 
             migrationBuilder.DropColumn(
                 name: "CreatedOn",
@@ -27,6 +33,27 @@ namespace Authorization.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
+                name: "Playlists",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Playlists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Playlists_Profiles_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PlaylistSong",
                 columns: table => new
                 {
@@ -37,9 +64,9 @@ namespace Authorization.Migrations
                 {
                     table.PrimaryKey("PK_PlaylistSong", x => new { x.PlaylistsId, x.SongsId });
                     table.ForeignKey(
-                        name: "FK_PlaylistSong_LikedList_PlaylistsId",
+                        name: "FK_PlaylistSong_Playlists_PlaylistsId",
                         column: x => x.PlaylistsId,
-                        principalTable: "LikedList",
+                        principalTable: "Playlists",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -51,8 +78,8 @@ namespace Authorization.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_LikedList_OwnerId",
-                table: "LikedList",
+                name: "IX_Playlists_OwnerId",
+                table: "Playlists",
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
@@ -66,13 +93,19 @@ namespace Authorization.Migrations
             migrationBuilder.DropTable(
                 name: "PlaylistSong");
 
-            migrationBuilder.DropIndex(
-                name: "IX_LikedList_OwnerId",
-                table: "LikedList");
+            migrationBuilder.DropTable(
+                name: "Playlists");
 
             migrationBuilder.DropColumn(
                 name: "Birthday",
                 table: "Profiles");
+
+            migrationBuilder.AddColumn<int>(
+                name: "RoleId",
+                table: "Users",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedOn",
@@ -80,6 +113,41 @@ namespace Authorization.Migrations
                 type: "datetime2",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.CreateTable(
+                name: "LikedList",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    OwnerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LikedList", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LikedList_Profiles_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "LikedListSong",

@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebApiWithEF.Repository
 {
-    public class PlaylistContext : DbContext, IUserRepository
+    public class PlaylistContext : DbContext
     {
         public PlaylistContext(DbContextOptions<PlaylistContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
         public DbSet<Song> Songs { get; set; }
-        public DbSet<UserProfile> Profiles { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
 
-        public void AddUser(User user)
+        public async Task AddUser(User user, Profile profile)
         {
-            Users.Add(user);
+            await Users.AddAsync(user);
+            await Profiles.AddAsync(profile);
         }
         public User GetUser(string email)
         {

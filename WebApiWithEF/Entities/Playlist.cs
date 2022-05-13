@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
         //1:n Profile:Playlist
         public Guid OwnerId { get; set; }
-        public UserProfile Owner { get; set; }
+        public Profile Owner { get; set; }
         //n:n LikedLists:Songs
         public List<Song> Songs { get; set; }
 
