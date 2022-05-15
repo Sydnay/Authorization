@@ -7,7 +7,7 @@ namespace WebApiWithEF.Dtos
     {
         [Required]
         public string Name { get; set; }
-        public DateTime Birthday { get; set; }
+        public DateTime? Birthday { get; set; }
         [Required]
         [Range(0, 1)]
         public Gender Gender { get; set; }

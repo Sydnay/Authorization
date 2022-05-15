@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
+using Authorization.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,10 @@ builder.Services.AddDbContext<PlaylistContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ConnectionToSQL"));
 });
-//builder.Services.AddSingleton<MemoryUserRepository>();
+
+builder.Services.AddTransient<SongRepository>();
+builder.Services.AddTransient<AccountRepository>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;

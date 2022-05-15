@@ -1,30 +1,29 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Authorization.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApiWithEF.Dtos;
 
 namespace WebApiWithEF.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
-        PlaylistContext repository;
-        public UserController(PlaylistContext repository)
+        AccountRepository repository;
+        public UserController(AccountRepository repository)
         {
             this.repository = repository;
         }
 
         [HttpGet]
-        public ActionResult GetAllAuthorizedUsers()
+        public async Task<ActionResult> GetAllAuthorizedUsers()
         {
-            return Ok(repository.GetAllUsers());
+            return Ok(await repository.GetAllUsers());
         }
         [HttpGet("user")]
-        public ActionResult GetAuthorizedUser(string login)
+        public async Task<ActionResult> GetAuthorizedUser(string email)
         {
-            var user = repository.GetUser(login);
+            var user = await repository.GetUser(email);
 
             if (user == null)
                 return NotFound();
@@ -32,13 +31,13 @@ namespace WebApiWithEF.Controllers
             return Ok(user);
         }
         [HttpDelete]
-        public ActionResult DeleteUser(string login)
+        public async Task<ActionResult> DeleteUser(string login)
         {
-            if (repository.GetUser(login) == null)
+            if (await repository.GetUser(login) == null)
                 return NotFound();
 
-            repository.DeleteUser(login);
-            repository.SaveChanges();
+            await repository.DeleteUser(login);
+
             return Ok(login);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using Authorization.Dtos;
 using Authorization.Entities;
+using Authorization.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -10,8 +11,8 @@ namespace Authorization.Controllers
     [Route("api/[controller]")]
     public class ProfileController : Controller
     {
-        PlaylistContext repository;
-        public ProfileController(PlaylistContext repository)
+        AccountRepository repository;
+        public ProfileController(AccountRepository repository)
         {
             this.repository = repository;
         }
@@ -20,28 +21,26 @@ namespace Authorization.Controllers
         [Authorize]
         public async Task<ActionResult<ProfileInfoDto>> GetProfileInfo()
         {
-            ClaimsPrincipal currentUser = User;
-            var email = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var profile = await repository.Profiles.FirstOrDefaultAsync(user => user.User.Email.Equals(email));
+            var profile = await GetCurrentUserProfile();
 
-            return profile.ProfileInfo();
+            return profile.ToProfileInfo();
         }
         [HttpPut("update")]
         [Authorize]
         public async Task<ActionResult> UpdateProfile(UpdateProfileDto profileDto)
         {
+            var profile = await GetCurrentUserProfile();
+
+            await repository.UpdateProfile(profile, profileDto);
+
+            return Ok(profile.ToProfileInfo());
+        }
+        private async Task<Profile> GetCurrentUserProfile()
+        {
             ClaimsPrincipal currentUser = User;
             var email = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var profile = repository.Profiles.FirstOrDefault(user => user.User.Email.Equals(email));
-
-            profile.Gender = profileDto.Gender;
-            profile.Name = profileDto.Name is null? profile.Name:profileDto.Name;
-            profile.Birthday = profileDto.Birthday is null ? profile.Birthday : profileDto.Birthday;
-
-            repository.Profiles.Update(profile);
-            await repository.SaveChangesAsync();
-
-            return Ok(profile.ProfileInfo());
+            var profile = await repository.GetProfile(email);
+            return profile;
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Authorization.Dtos
 {
-    public static class ToProfileInfo
+    public static class ProfileInfo
     {
-        public static ProfileInfoDto ProfileInfo(this Profile profile)
+        public static ProfileInfoDto ToProfileInfo(this Profile profile)
         {
             return new ProfileInfoDto
             {

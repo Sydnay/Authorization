@@ -1,5 +1,6 @@
 ﻿using Authorization.Dtos;
 using Authorization.Entities;
+using Authorization.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,12 @@ namespace Authorization.Controllers
     [Route("api/[controller]")]
     public class SongController : Controller
     {
-        private readonly PlaylistContext repository;
-        public SongController(PlaylistContext repository)
+        private readonly SongRepository repository;
+        public SongController(SongRepository repository)
         {
             this.repository = repository;
         }
+
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> AddSong(CreateSongDto request)
@@ -26,29 +28,24 @@ namespace Authorization.Controllers
                 CreatedOn = DateTime.Now,
             };
 
-            await repository.Songs.AddAsync(song);
-            await repository.SaveChangesAsync();
+            await repository.AddSong(song);
 
             return Ok(song);
         }
         [HttpGet("songs")]
         public async Task<ActionResult<List<Song>>> GetAllSongs()
         {
-            return await repository.Songs.ToListAsync();
+            return await repository.GetAllSongs();
         }
         [HttpPut("updatesongname")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> UpdateSong(Guid id, UpdateSongDto songDto)
         {
-            var song = await repository.Songs.FirstOrDefaultAsync(song => song.Id == id);
+            var song = await repository.GetSong(id);
             if (song is null)
                 return BadRequest("Song doesn't found");
 
-            song.Name = songDto.Name;
-            song.Singer = songDto.Singer;
-
-            repository.Songs.Update(song);
-            await repository.SaveChangesAsync();
+            await repository.UpdateSong(song, songDto);
 
             return Ok(song);
         }
@@ -56,12 +53,11 @@ namespace Authorization.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteSong(Guid id)
         {
-            var song = await repository.Songs.FirstOrDefaultAsync(song => song.Id == id);
+            var song = await repository.GetSong(id);
             if (song is null)
                 return BadRequest("Song doesn't found");
 
-            repository.Songs.Remove(song);
-            await repository.SaveChangesAsync();
+            await repository.DeleteSong(song);
 
             return Ok(song.Name);
         }

@@ -8,5 +8,4 @@ namespace Authorization.Dtos
         public Gender Gender { get; set; }
         public DateTime? Birthday { get; set; }
     }
-    
 }

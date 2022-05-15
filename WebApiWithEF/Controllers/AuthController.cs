@@ -1,5 +1,6 @@
-﻿using Authorization.Models;
-using Authorization.Entities;
+﻿using Authorization.Entities;
+using Authorization.Models;
+using Authorization.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -15,9 +16,9 @@ namespace WebApiWithEF.Controllers
     [Route("api/[controller]")]
     public class AuthController : Controller
     {
-        private readonly PlaylistContext repository;
+        private readonly AccountRepository repository;
         private readonly IConfiguration configuration;
-        public AuthController(IConfiguration configuration, PlaylistContext repository)
+        public AuthController(IConfiguration configuration, AccountRepository repository)
         {
             this.configuration = configuration;
             this.repository = repository;
@@ -26,7 +27,7 @@ namespace WebApiWithEF.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto request)
         {
-            if (repository.GetUser(request.Email) != null)
+            if (await repository.GetUser(request.Email) != null)
                 return BadRequest("User with this login is already exist");
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -44,13 +45,13 @@ namespace WebApiWithEF.Controllers
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
+                Birthday = request.Birthday,
                 Gender = request.Gender,
                 UserId = user.Id,
                 User = user
             };
-            await repository.Users.AddAsync(user);
-            await repository.Profiles.AddAsync(userProfile);
-            repository.SaveChanges();
+
+            await repository.AddUser(user, userProfile);
 
             return Ok(user);
         }
@@ -58,7 +59,7 @@ namespace WebApiWithEF.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginDto request)
         {
-            var user = await repository.Users.FirstOrDefaultAsync(user => user.Email.Equals(request.Email));
+            var user = await repository.GetUser(request.Email);
 
             if (user == null)
                 return NotFound();
@@ -71,22 +72,19 @@ namespace WebApiWithEF.Controllers
         }
         [HttpPost("admin")]
         [Authorize]
-        public async Task<ActionResult> BecameAdmin(string secretWord)
+        public async Task<ActionResult> RaiseToAdmin(string secretWord)
         {
             if (secretWord.Equals(configuration.GetSection("AppSettings:TokenKey").Value))
             {
                 ClaimsPrincipal currentUser = User;
                 var email = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                var user = repository.GetUser(email);
+                var user = await repository.GetUser(email);
 
                 if (user is null)
                     return NotFound();
 
-                user.Role = "Admin";
-
-                repository.Users.Update(user);
-                repository.SaveChanges();
+                await repository.UpdateRole(user, "Admin");
 
                 return Ok(user.Role);
             }
